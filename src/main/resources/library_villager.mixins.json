@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.jeefbeebos23.library_villager.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "MerchantOfferAccessor",
+    "MerchantOfferMixin",
+    "VillagerMixin",
+    "AnvilMenuMixin"
+  ],
+  "injectors": { "defaultRequire": 1 }
+}

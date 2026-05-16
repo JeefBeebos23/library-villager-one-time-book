@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "library_villager",
+  "version": "1.0.0",
+  "name": "Library Villager One-Time Book",
+  "description": "Librarian villagers give a one-time Mystery Book instead of restocking enchanted book trades.",
+  "authors": ["JeefBeebos23"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.jeefbeebos23.library_villager.LibraryVillager"]
+  },
+  "mixins": ["library_villager.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "fabric-api": "*",
+    "minecraft": "~26.1.2"
+  }
+}
