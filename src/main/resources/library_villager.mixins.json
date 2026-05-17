@@ -5,8 +5,7 @@
   "mixins": [
     "MerchantOfferAccessor",
     "MerchantOfferMixin",
-    "VillagerMixin",
-    "AnvilMenuMixin"
+    "VillagerMixin"
   ],
   "injectors": { "defaultRequire": 1 }
 }
