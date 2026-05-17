@@ -8,7 +8,7 @@ import net.minecraft.resources.Identifier;
 public record SelectEnchantmentPayload(Identifier enchantmentId) implements CustomPacketPayload {
 
     public static final Type<SelectEnchantmentPayload> TYPE =
-        CustomPacketPayload.createType("library_villager:select_enchantment");
+        new Type<>(Identifier.fromNamespaceAndPath("library_villager", "select_enchantment"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SelectEnchantmentPayload> STREAM_CODEC =
         StreamCodec.of(
