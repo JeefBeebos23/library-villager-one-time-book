@@ -9,7 +9,9 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -19,10 +21,14 @@ public class LibraryVillager implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        ResourceKey<Item> mysteryBookKey = ResourceKey.create(
+            Registries.ITEM,
+            Identifier.fromNamespaceAndPath(MOD_ID, "mystery_book")
+        );
         LibraryVillagerItems.MYSTERY_BOOK = Registry.register(
             BuiltInRegistries.ITEM,
-            Identifier.fromNamespaceAndPath(MOD_ID, "mystery_book"),
-            new MysteryBookItem(new MysteryBookItem.Properties().stacksTo(1))
+            mysteryBookKey,
+            new MysteryBookItem(new MysteryBookItem.Properties().setId(mysteryBookKey).stacksTo(1))
         );
 
         PayloadTypeRegistry.serverboundPlay().register(
