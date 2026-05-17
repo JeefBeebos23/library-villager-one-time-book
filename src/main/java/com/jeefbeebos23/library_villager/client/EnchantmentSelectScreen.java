@@ -29,8 +29,19 @@ public class EnchantmentSelectScreen extends Screen {
     private static final int COLS = 9;
     private static final int SLOT_SIZE = 18;
     private static final int VISIBLE_ROWS = 6;
+    // Panel inner width: 9 slots × 18px + 7px padding each side = 176px (matches vanilla chest width)
     private static final int PANEL_WIDTH = COLS * SLOT_SIZE + 14;
     private static final int PANEL_HEIGHT = VISIBLE_ROWS * SLOT_SIZE + 34;
+
+    // Vanilla-style slot colors
+    private static final int COLOR_PANEL      = 0xFFC6C6C6;
+    private static final int COLOR_BORDER_LT  = 0xFFFFFFFF; // raised panel top/left highlight
+    private static final int COLOR_BORDER_DK  = 0xFF555555; // raised panel bottom/right shadow
+    private static final int COLOR_SLOT       = 0xFF8B8B8B; // normal slot interior
+    private static final int COLOR_SLOT_HOVER = 0xFF9999BB; // hovered slot interior
+    private static final int COLOR_SLOT_LT    = 0xFFFFFFFF; // recessed slot bottom/right
+    private static final int COLOR_SLOT_DK    = 0xFF373737; // recessed slot top/left
+    private static final int COLOR_FILLER     = 0xFF666666; // empty trailing slot
 
     private record SlotEntry(ItemStack stack, Identifier enchantmentId) {}
 
@@ -85,10 +96,13 @@ public class EnchantmentSelectScreen extends Screen {
     }
 
     @Override
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
+        extractMenuBackground(g);
+    }
+
+    @Override
     public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        g.fill(0, 0, width, height, 0xA0000000);
-        g.fill(panelX, panelY, panelX + PANEL_WIDTH, panelY + PANEL_HEIGHT, 0xFFC6C6C6);
-        g.text(font, title, panelX + 7, panelY + 6, 0x404040, false);
+        drawPanel(g);
 
         int slotAreaTop = panelY + 17;
         int hoveredRow = -1, hoveredCol = -1;
@@ -102,19 +116,16 @@ public class EnchantmentSelectScreen extends Screen {
                 boolean hovering = mouseX >= sx && mouseX < sx + SLOT_SIZE
                                 && mouseY >= sy && mouseY < sy + SLOT_SIZE;
 
-                if (entry.stack().isEmpty()) {
-                    g.fill(sx, sy, sx + SLOT_SIZE, sy + SLOT_SIZE, 0xFF666666);
-                } else if (entry.enchantmentId() != null) {
-                    g.fill(sx, sy, sx + SLOT_SIZE, sy + SLOT_SIZE, hovering ? 0xFF9999BB : 0xFF8B8B8B);
-                }
-
-                if (!entry.stack().isEmpty()) {
+                if (entry.enchantmentId() == null && entry.stack().isEmpty()) {
+                    drawSlot(g, sx, sy, COLOR_FILLER);
+                } else if (entry.enchantmentId() == null) {
+                    // Separator glass pane — flat fill matching panel, item rendered on top
+                    g.fill(sx, sy, sx + SLOT_SIZE, sy + SLOT_SIZE, COLOR_PANEL);
                     g.item(entry.stack(), sx + 1, sy + 1);
-                }
-
-                if (hovering && entry.enchantmentId() != null) {
-                    hoveredRow = scrollRow + r;
-                    hoveredCol = c;
+                } else {
+                    drawSlot(g, sx, sy, hovering ? COLOR_SLOT_HOVER : COLOR_SLOT);
+                    g.item(entry.stack(), sx + 1, sy + 1);
+                    if (hovering) { hoveredRow = scrollRow + r; hoveredCol = c; }
                 }
             }
         }
@@ -132,6 +143,28 @@ public class EnchantmentSelectScreen extends Screen {
             SlotEntry entry = rows.get(hoveredRow)[hoveredCol];
             g.setTooltipForNextFrame(font, entry.stack(), mouseX, mouseY);
         }
+    }
+
+    private void drawPanel(GuiGraphicsExtractor g) {
+        // Fill
+        g.fill(panelX, panelY, panelX + PANEL_WIDTH, panelY + PANEL_HEIGHT, COLOR_PANEL);
+        // Raised border: light top + left, dark bottom + right
+        g.fill(panelX, panelY, panelX + PANEL_WIDTH - 1, panelY + 1, COLOR_BORDER_LT);
+        g.fill(panelX, panelY, panelX + 1, panelY + PANEL_HEIGHT - 1, COLOR_BORDER_LT);
+        g.fill(panelX + 1, panelY + PANEL_HEIGHT - 1, panelX + PANEL_WIDTH, panelY + PANEL_HEIGHT, COLOR_BORDER_DK);
+        g.fill(panelX + PANEL_WIDTH - 1, panelY + 1, panelX + PANEL_WIDTH, panelY + PANEL_HEIGHT, COLOR_BORDER_DK);
+        // Title
+        g.text(font, title, panelX + 8, panelY + 6, 0x404040, false);
+    }
+
+    private void drawSlot(GuiGraphicsExtractor g, int x, int y, int fillColor) {
+        // Recessed look: dark top+left, light bottom+right
+        g.fill(x, y, x + SLOT_SIZE, y + 1, COLOR_SLOT_DK);
+        g.fill(x, y + 1, x + 1, y + SLOT_SIZE, COLOR_SLOT_DK);
+        g.fill(x + 1, y + SLOT_SIZE - 1, x + SLOT_SIZE, y + SLOT_SIZE, COLOR_SLOT_LT);
+        g.fill(x + SLOT_SIZE - 1, y + 1, x + SLOT_SIZE, y + SLOT_SIZE - 1, COLOR_SLOT_LT);
+        // Interior
+        g.fill(x + 1, y + 1, x + SLOT_SIZE - 1, y + SLOT_SIZE - 1, fillColor);
     }
 
     @Override

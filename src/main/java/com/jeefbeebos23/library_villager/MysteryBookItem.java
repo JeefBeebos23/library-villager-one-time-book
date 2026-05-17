@@ -7,6 +7,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 public class MysteryBookItem extends Item {
@@ -21,6 +22,11 @@ public class MysteryBookItem extends Item {
             openScreenClient();
         }
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public boolean isFoil(ItemStack stack) {
+        return true;
     }
 
     @Environment(EnvType.CLIENT)
